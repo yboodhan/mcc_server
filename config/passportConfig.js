@@ -53,6 +53,8 @@ function createNewUser(id, firstName, lastName, facebookEmail) {
 
 // Local and facebook strategies
 passport.serializeUser(function (user, done) {
+    console.log('serializing')
+    console.log(user)
     done(null, user.id);
 });
 
@@ -67,18 +69,23 @@ passport.deserializeUser(function (id, done) {
 // Local auth
 passport.use(new LocalStrategy(
     async function (username, password, done) {
-
+        console.log('started local check')
         // Find a user with the username
         let user = await findUserByUsername(username);
-
+        console.log(user)
         // If user not found
-        if (!user) { return done(null, false); }
+        if (!user) { done(null, false); }
 
         // If user is found, check password
         if (user) {
             let verfiedUser = await verifyPassword(user, password);
-            if (!verfiedUser) { return done(null, false); }
-            return done(null, user);
+            console.log(verfiedUser)
+            if (!verfiedUser) { 
+                done(null, false); 
+            } else {
+                console.log('sending verified info')
+                done(null, user);
+            }
         }
     }
 ));

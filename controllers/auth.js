@@ -5,16 +5,28 @@ require('dotenv').config();
 let CLIENT_URL = process.env.CLIENT_URL;
 
 // LOCAL AUTH -----------------------------------------------------------------
-router.post('/login', passport.authenticate('local', {
-    successRedirect: `${CLIENT_URL}`,
-    failureRedirect: '/auth/login/failed',
-}))
+router.post('/login', function(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.redirect('/auth/login/failed'); }
+      req.logIn(user, function(err) {
+        if (err) { return next(err); }
+        console.log(req.user, 'is my user')
+        return res.json({
+            message: "User has successfully authenticated.",
+            status: 200,
+            user: req.user,
+            cookies: req.cookies
+        });;
+      });
+    })(req, res, next);
+})
 
 // FACEBOOK AUTH --------------------------------------------------------------
 router.get('/facebook', passport.authenticate('facebook'))
 
 router.get('/facebook/callback', passport.authenticate('facebook', {
-    successRedirect: `${CLIENT_URL}/profile`,
+    successRedirect: `${CLIENT_URL}`,
     failureRedirect: '/auth/login/failed'
 }))
 
@@ -29,7 +41,6 @@ router.get("/logout", (req, res) => {
 router.get("/login/success", (req, res) => {
     console.log('got to login route')
     if (req.user) {
-        console.log('found a user at success login route')
         res.json({
             message: "User has successfully authenticated.",
             status: 200,

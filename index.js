@@ -23,7 +23,7 @@ app.use(
 );
 app.use(cookieParser());
 
-app.use(session({ secret: process.env.SECRET_KEY, saveUninitialized: false, resave: true }));
+app.use(session({ secret: process.env.SECRET_KEY, saveUninitialized: true, resave: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 let isLoggedInUser = require('./middleware/isLoggedInUser');
