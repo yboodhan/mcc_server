@@ -1,10 +1,9 @@
-require('dotenv').config();
-let CLIENT_URL = process.env.CLIENT_URL;
-
+// Unauthenticated users are redirected to auth failure route
+// Authenticated users continue
 module.exports = (req, res, next) => {
-    if (req.user) {
-        next();
+    if (!req.user) {
+        res.redirect('/auth/login/failed');
     } else {
-        res.redirect(`${CLIENT_URL}`);
+        next();
     }
-}
+};

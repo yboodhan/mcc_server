@@ -1,24 +1,31 @@
 // Import passport and relevant strategies
-require('dotenv').config();
 let passport = require('passport');
 let FacebookStategy = require('passport-facebook').Strategy;
 let LocalStrategy = require('passport-local').Strategy;
 
-// Import the user.json data set using fs (alternative to DB)
+// Require .env variables (access using process.env)
+require('dotenv').config();
+
+// Require file system to use as temporary db
 let fs = require('fs');
 
-// Helper functions for finding/creating user
+// HELPER FUNCTIONS (for finding/creating user) -------------------------------
+
+// Finds a user in user.json file using user id (returns user or null)
 function findUserById(id) {
     let allUsers = fs.readFileSync('./config/user.json');
     allUsers = JSON.parse(allUsers);
+
     for (let i = 0; i < allUsers.length; i++) {
         if (allUsers[i].id == id) {
             return allUsers[i];
         }
     }
+
     return null;
 };
 
+// Finds a user in user.json file using username (returns user or null) - local auth
 function findUserByUsername(username) {
     let allUsers = fs.readFileSync('./config/user.json');
     allUsers = JSON.parse(allUsers);
@@ -27,14 +34,17 @@ function findUserByUsername(username) {
             return allUsers[i];
         }
     }
+
     return null;
 };
 
+// Verifies the passport for a user (local auth)
 function verifyPassword(user, password) {
     return user.password == password;
 }
 
-function createNewUser(id, firstName, lastName, facebookEmail) {
+// Creates a new user and adds to user.json file (returns new user)
+function createNewUser(id, firstName, lastName, email) {
     let allUsers = fs.readFileSync('./config/user.json');
     allUsers = JSON.parse(allUsers);
 
@@ -42,7 +52,7 @@ function createNewUser(id, firstName, lastName, facebookEmail) {
         "id": id,
         "firstName": firstName,
         "lastName": lastName,
-        "email": facebookEmail,
+        "email": email,
     };
 
     allUsers.push(newUser);
@@ -51,74 +61,64 @@ function createNewUser(id, firstName, lastName, facebookEmail) {
     return newUser;
 }
 
-// Local and facebook strategies
+// Serializer user
 passport.serializeUser(function (user, done) {
-    console.log('serializing')
-    console.log(user)
     done(null, user.id);
 });
 
+// Deserialize user
 passport.deserializeUser(function (id, done) {
-    console.log('🚫 deserializing')
     let user = findUserById(id);
-    console.log(user)
     if (!user) { return done(null, false); }
     return done(null, user);
 });
 
-// Local auth
+// PASSPORT AUTH --------------------------------------------------------------
+
+// Logs in default user ("pryon") - local auth
 passport.use(new LocalStrategy(
     async function (username, password, done) {
-        console.log('started local check')
+
         // Find a user with the username
         let user = await findUserByUsername(username);
-        console.log(user)
+
         // If user not found
         if (!user) { done(null, false); }
 
         // If user is found, check password
         if (user) {
             let verfiedUser = await verifyPassword(user, password);
-            console.log(verfiedUser)
-            if (!verfiedUser) { 
-                done(null, false); 
+            if (!verfiedUser) {
+                done(null, false);
             } else {
-                console.log('sending verified info')
                 done(null, user);
             }
         }
     }
 ));
 
-// Facebook auth
+// Logs in verified users through facebook
 passport.use(new FacebookStategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
     callbackURL: process.env.BASE_URL + process.env.FACEBOOK_CALLBACK_URL,
     profileFields: ['id', 'name', 'email']
 }, async (accessToken, refreshToken, profile, done) => {
-    console.log('getting into fb')
-    console.log(profile)
-    // If the user exists, get their info
+
+    // Find user if they exist
     const currentUser = await findUserById(profile._json.id);
-    console.log('current user:')
-    console.log(currentUser)
+
     // If the user is new, add them
     if (!currentUser) {
 
-        // Create the new user and save to our file
         const newUser = await createNewUser(profile._json.id, profile._json.first_name, profile._json.last_name, profile._json.email);
 
-        console.log('new user')
-        console.log(newUser)
-        if (newUser) {
-            done(null, newUser);
-        } else {
-            done(null, false);
-        }
+        if (newUser) { done(null, newUser); } 
+        else { done(null, false); }
+
     } else {
         done(null, currentUser);
     }
-}))
+}));
 
 module.exports = passport;

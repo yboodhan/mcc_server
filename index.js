@@ -1,64 +1,65 @@
+// Require express and declare app object
 const express = require('express');
 const app = express();
+
+// Load environmental variables from the .env file (access using process.env)
 require('dotenv').config();
 
-const session = require("express-session");
+// Require cookie-based session middleware for client cookie (no databse required)
 const cookieSession = require("cookie-session");
 const cookieParser = require("cookie-parser");
+
+// Require authentication middleware
 const passport = require("passport");
-const bodyParser = require('body-parser');
+
+// Require CORS (cross-origin resource sharing) enabling middleware
 const cors = require('cors');
 
-// Set up body parser
-app.use(bodyParser.urlencoded({ extended: true }));
+// Require body parsing middleware for incoming body (access body using req.body)
+const bodyParser = require('body-parser');
+
+// Set up body parser to parse application/json body
 app.use(bodyParser.json());
 
-// Set up passport + session
+// Set up signed cookie session to last 1 day (1000ms/1s * 60s/1min * 60min/1hr * 24hrs/1day)
 app.use(
     cookieSession({
-      name: "session",
-      keys: [process.env.SECRET_KEY],
-      maxAge: 24 * 60 * 60 * 100 // 24 hours
+        name: "session",
+        keys: [process.env.SECRET_KEY],
+        maxAge: 24 * 60 * 60 * 1000
     })
 );
+
+// Parse cookie header (access using req.cookies)
 app.use(cookieParser());
 
-app.use(session({ secret: process.env.SECRET_KEY, saveUninitialized: true, resave: true }));
+// Initialize passport and it's strategies and sessions for persistent login
 app.use(passport.initialize());
 app.use(passport.session());
-let isLoggedInUser = require('./middleware/isLoggedInUser');
 
-// Set up CORS to accept client requests
+// Set up CORS options for accept client requests and accept browser cookies
 app.use(
     cors({
-        origin: "https://localhost:3001",
+        origin: `${process.env.CLIENT_URL}`,
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true
     })
 );
 
-// Import controllers routes
+// Import controllers routes for auth and notify (astronaut and iss location APIs)
 app.use('/auth', require('./controllers/auth'));
 app.use('/', require('./controllers/notify'));
 
-app.get("/", isLoggedInUser, (req, res) => {
-    res.json({
-        authenticated: true,
-        message: "user successfully authenticated",
-        user: req.user,
-        cookies: req.cookies
-    });
+// Deal with requests to routes that do not exist (bad requests)
+app.get('*', (req, res) => {
+    res.status(400).json({
+        status: "error",
+        message: "Bad Request"
+    })
 });
 
-app.get('*', (req, res) => {
-    res.send({
-        status: "error",
-        message: "Request is invalid.",
-        code: 400
-    })
-})
-
+// Run server instance
 app.listen(3000, () => {
-    console.log('🏃🏽‍♂️ The Pryon MCC server is up and running!')
-})
+    console.log('🛰  👩🏾‍🚀 The Pryon MCC server is up and running! 🚀 ☄️')
+});
 
