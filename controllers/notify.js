@@ -13,12 +13,14 @@ router.get('/astronauts', isLoggedInUser, async (req, res) => {
         let astronautsData = await axios.get("http://api.open-notify.org/astros.json");
         res.json({ 
             status: "success",
+            code: 200,
             message: "Successully got astronaut data",
             ...astronautsData.data 
         });
     } catch (error) {
-        res.status(500).json({ 
+        res.json({ 
             status: "error",
+            code: 500,
             message: `There was an error calling the open notify API for people in space. ${error}`,
             error: error
         });
@@ -31,12 +33,14 @@ router.get('/location', isLoggedInUser, async (req, res) => {
         let locationData = await axios.get("http://api.open-notify.org/iss-now.json");
         res.json({ 
             status: "success",
+            code: 200,
             message: "Successully got ISS location data",
             ...locationData.data 
         });
     } catch (error) {
-        res.status(500).json({ 
+        res.json({ 
             status: "error",
+            code: 500,
             message: `There was an error calling the open notify API for ISS location.`, 
             error: error
         });

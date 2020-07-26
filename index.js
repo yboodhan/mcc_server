@@ -52,8 +52,9 @@ app.use('/', require('./controllers/notify'));
 
 // Deal with requests to routes that do not exist (bad requests)
 app.get('*', (req, res) => {
-    res.status(400).json({
+    res.json({
         status: "error",
+        code: 400,
         message: "Bad Request"
     })
 });

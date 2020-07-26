@@ -17,8 +17,9 @@ router.post('/login', function (req, res, next) {
         if (!user) { return res.redirect('/auth/login/failed'); }
         req.logIn(user, function (err) {
             if (err) { return next(err); }
-            return res.status(200).json({
+            return res.json({
                 status: "success",
+                code: 200,
                 message: "Successful Authenticatication",
                 user: req.user,
                 cookies: req.cookies
@@ -51,9 +52,10 @@ router.get("/logout", (req, res) => {
 // Logs in user if session is valid, if no session, do nothing (automatic login)
 router.get("/login/success", (req, res) => {
     if (req.user) {
-        res.status(200).json({
+        res.json({
+            status: "success",
+            code: 200,
             message: "Successful Authenticatication",
-            status: 200,
             user: req.user,
             cookies: req.cookies
         });
@@ -64,7 +66,7 @@ router.get("/login/success", (req, res) => {
 
 // Alerts user if not authenticated
 router.get("/login/failed", (req, res) => {
-    res.status(401).json({ status: "error", message: "Not Authenticated" });
+    res.json({ status: "error", code: 401, message: "Not Authenticated" });
 });
 
 module.exports = router;
