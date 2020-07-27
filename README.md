@@ -1,6 +1,6 @@
 ## Description
 
-This is the node server repository for the Pryon Mission Control Center application. The repository for the react client of this app can found here: [https://github.com/yboodhan/mcc_server](https://github.com/yboodhan/mcc_server).
+This is the node server repository for the Pryon Mission Control Center application. The repository for the react client of this app can found here: [https://github.com/yboodhan/mcc_client](https://github.com/yboodhan/mcc_client).
 
 ### Installation instructions
 
