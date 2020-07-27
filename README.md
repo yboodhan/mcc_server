@@ -4,7 +4,7 @@ This is the node server repository for the Pryon Mission Control Center applicat
 
 ### Installation instructions
 
-1. [https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository](Clone) this repository onto your local computer. 
+1. Clone this repository onto your local computer. For more information on cloning, see [https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository].
 
 2. Access the directory using `cd mcc-server`. Install all dependencies using `npm i`.
 
