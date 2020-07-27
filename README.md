@@ -8,7 +8,7 @@ This is the node server repository for the Pryon Mission Control Center applicat
 
 2. Access the directory using `cd mcc-server`. Install all dependencies using `npm i`.
 
-3. Create a `.env` file to store the following values ($ = get through Facebook/admin):
+3. Create a `.env` file in the root directory to store the following values ($ = get through Facebook/admin):
     ```
     * BASE_URL = "http://localhost:3000"
     * FACEBOOK_CLIENT_ID = "$"
