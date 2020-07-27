@@ -8,11 +8,11 @@ This is the node server repository for the Pryon Mission Control Center applicat
 
 2. Access the directory using `cd mcc-server`. Install all dependencies using `npm i`.
 
-3. Create a `.env` file in the root directory to store the following values ($ = get through Facebook/admin):
+3. Add the facebook client id and secret to the existing `.env` file in the root directory (get from admin). Note: It might be best to manually type these values in instead of copy pasting to avoid invalid credentials due to hidden formatting (guilty!). Contents should be:
     ```
     * BASE_URL = "http://localhost:3000"
-    * FACEBOOK_CLIENT_ID = "$"
-    * FACEBOOK_CLIENT_SECRET = "$"
+    * FACEBOOK_CLIENT_ID = "ADD THIS"
+    * FACEBOOK_CLIENT_SECRET = "ADD THIS"
     * FACEBOOK_CALLBACK_URL = "/auth/facebook/callback"
     * CLIENT_URL = "https://localhost:3001"
     * SECRET_KEY= "fgdLC7X5eJyaPr9lQmsKlsYUTDbFBK"
