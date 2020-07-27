@@ -64,3 +64,5 @@ app.listen(3000, () => {
     console.log('🛰  👩🏾‍🚀 The Pryon MCC server is up and running! 🚀 ☄️')
 });
 
+module.exports = app;
+
